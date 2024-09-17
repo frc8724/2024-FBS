@@ -64,9 +64,11 @@ public class CANDrivetrain extends SubsystemBase {
 
     // The left motor is CCW+
     leftFront.setInverted(false);
+    leftRear.setInverted(false);
 
     // The right motor is CW+
     rightFront.setInverted(true);
+    rightRear.setInverted(true);
 
     // Ensure our followers are following their respective leader
     leftRear.follow(leftFront);
@@ -86,8 +88,8 @@ public class CANDrivetrain extends SubsystemBase {
     double leftPower = speed;
     double rightPower = speed;
 
-    leftPower += rotation;
-    rightPower -= rotation;
+    leftPower -= rotation;
+    rightPower += rotation;
 
     // clip left to [-1, +1]
     leftPower = Math.min(1.0, leftPower);

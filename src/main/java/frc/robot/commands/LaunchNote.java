@@ -7,6 +7,7 @@ package frc.robot.commands;
 import static frc.robot.Constants.LauncherConstants.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.CANLauncher;
 import frc.robot.subsystems.PWMLauncher;
 
 // import frc.robot.subsystems.CANLauncher;
@@ -15,12 +16,12 @@ import frc.robot.subsystems.PWMLauncher;
  * will override.
  */
 public class LaunchNote extends Command {
-  PWMLauncher m_launcher;
+  // PWMLauncher m_launcher;
 
-  // CANLauncher m_launcher;
+  CANLauncher m_launcher;
 
   /** Creates a new LaunchNote. */
-  public LaunchNote(PWMLauncher launcher) {
+  public LaunchNote(CANLauncher launcher) {
     // save the launcher system internally
     m_launcher = launcher;
 
@@ -39,7 +40,8 @@ public class LaunchNote extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // There is nothing we need this command to do on each iteration. You could remove this method
+    // There is nothing we need this command to do on each iteration. You could
+    // remove this method
     // and the default blank method
     // of the base class will run.
   }
@@ -47,7 +49,8 @@ public class LaunchNote extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    // Always return false so the command never ends on it's own. In this project we use the
+    // Always return false so the command never ends on it's own. In this project we
+    // use the
     // scheduler to end the command when the button is released.
     return false;
   }

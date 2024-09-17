@@ -7,9 +7,13 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.LauncherConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
+import frc.robot.commands.LaunchNote;
+import frc.robot.commands.PrepareLaunch;
 import frc.robot.subsystems.CANDrivetrain;
+import frc.robot.subsystems.CANLauncher;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -25,7 +29,7 @@ public class RobotContainer {
   // private final PWMDrivetrain m_drivetrain = new PWMDrivetrain();
   private final CANDrivetrain m_drivetrain = new CANDrivetrain();
   // private final PWMLauncher m_launcher = new PWMLauncher();
-  // private final CANLauncher m_launcher = new CANLauncher();
+  private final CANLauncher m_launcher = new CANLauncher();
 
   /*
    * The gamepad provided in the KOP shows up like an XBox controller if the mode
@@ -34,9 +38,8 @@ public class RobotContainer {
    */
   private final CommandXboxController m_driverController = new CommandXboxController(
       OperatorConstants.kDriverControllerPort);
-  // private final CommandXboxController m_operatorController = new
-  // CommandXboxController(
-  // OperatorConstants.kOperatorControllerPort);
+  private final CommandXboxController m_operatorController = new CommandXboxController(
+      OperatorConstants.kOperatorControllerPort);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -46,7 +49,7 @@ public class RobotContainer {
     configureBindings();
   }
 
-  private double ApplyDeadband(double val, double deadband) {
+  private double ApplyDeadband(double val, double deadband, boolean square) {
     double sign = (val > 0) ? +1.0 : -1.0;
     double mag = Math.abs(val);
 
@@ -56,6 +59,8 @@ public class RobotContainer {
 
     double offset = mag - deadband;
     double scaled = offset / (1.0 - deadband);
+    if (square)
+      scaled = scaled * scaled;
     return sign * scaled;
   }
 
@@ -71,7 +76,8 @@ public class RobotContainer {
     m_drivetrain.setDefaultCommand(
         new RunCommand(
             () -> m_drivetrain.arcadeDrive(
-                -ApplyDeadband(m_driverController.getLeftY(), .1), -ApplyDeadband(m_driverController.getRightX(), .1)),
+                -ApplyDeadband(m_driverController.getLeftY(), .1, true),
+                -ApplyDeadband(m_driverController.getRightX(), .1, true)),
             m_drivetrain));
 
     /*
@@ -79,19 +85,19 @@ public class RobotContainer {
      * (green) button. Run the PrepareLaunch
      * command for 1 seconds and then run the LaunchNote command
      */
-    // m_operatorController
-    // .a()
-    // .whileTrue(
-    // new PrepareLaunch(m_launcher)
-    // .withTimeout(LauncherConstants.kLauncherDelay)
-    // .andThen(new LaunchNote(m_launcher))
-    // .handleInterrupt(() -> m_launcher.stop()));
+    m_operatorController
+        .a()
+        .whileTrue(
+            new PrepareLaunch(m_launcher)
+                .withTimeout(LauncherConstants.kLauncherDelay)
+                .andThen(new LaunchNote(m_launcher))
+                .handleInterrupt(() -> m_launcher.stop()));
 
-    // // Set up a binding to run the intake command while the operator is pressing
+    // Set up a binding to run the intake command while the operator is pressing
     // and
-    // // holding the
-    // // left Bumper
-    // m_operatorController.leftBumper().whileTrue(m_launcher.getIntakeCommand());
+    // holding the
+    // left Bumper
+    m_operatorController.leftBumper().whileTrue(m_launcher.getIntakeCommand());
   }
 
   /**
